@@ -1,18 +1,34 @@
 services:
-  postgres:
-    image: postgres
-    container_name: postgres
-    restart: always
-    ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: gestion-de-stock
+    postgres:
+        image: postgres
+        container_name: postgres
+        restart: always
+        ports:
+            - '5432:5432'
+        environment:
+            POSTGRES_USER: admin
+            POSTGRES_PASSWORD: admin
+            POSTGRES_DB: gestion-de-stock
 
-  adminer:
-    image: adminer
-    container_name: adminer
-    restart: always
-    ports:
-      - '8080:8080'
+    adminer:
+        image: adminer
+        container_name: adminer
+        restart: always
+        ports:
+            - '8080:8080'
+
+    stock-service:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: stock-container
+        restart: always
+        ports:
+            - '8083:8082'
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gestion-de-stock
+            SPRING_DATASOURCE_USERNAME: admin
+            SPRING_DATASOURCE_PASSWORD: admin
+            SPRING_JPA_HIBERNATE_DDL_AUTO: update
+        depends_on:
+            - postgres
