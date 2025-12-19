@@ -5,15 +5,16 @@ import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestion_de_stock.produit.model.Produit;
+import com.gestion_de_stock.produit.dto.ProduitRequestDTO;
+import com.gestion_de_stock.produit.dto.ProduitResponseDTO;
 import com.gestion_de_stock.produit.service.ProduitService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,27 +25,22 @@ public class ProduitController {
 	private final ProduitService produitService;
 
 	@GetMapping("/all")
-	public List<Produit> getAllProduits() {
+	public List<ProduitResponseDTO> getAllProduits() {
 		return produitService.getAllProduits();
 	}
 
-	@PostMapping("/add")
-	public Produit createProduit(@RequestBody Produit p) {
-		return produitService.createProduit(p);
-	}
-
-	@GetMapping("{id}")
-	public Produit getProduitById(@PathVariable long id) {
+	@GetMapping("/{id}")
+	public ProduitResponseDTO getProduitById(@PathVariable long id) {
 		return produitService.getProduitById(id);
 	}
 
-	@DeleteMapping("{id}")
-	public String deleteProduitById(@PathVariable long id) {
-		return produitService.deleteProduitById(id);
+	@DeleteMapping("/{id}")
+	public void deleteProduitById(@PathVariable long id) {
+		produitService.deleteProduitById(id);
 	}
 
-	@PutMapping("{id}")
-	public Produit editProduit(@PathVariable long id, @RequestBody Produit p) {
+	@PutMapping("/{id}")
+	public ProduitResponseDTO editProduit(@PathVariable long id, @Valid @RequestBody ProduitRequestDTO p) {
 		return produitService.editProduit(id, p);
 	}
 }

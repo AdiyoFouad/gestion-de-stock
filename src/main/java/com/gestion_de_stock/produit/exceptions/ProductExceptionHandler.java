@@ -1,0 +1,38 @@
+package com.gestion_de_stock.produit.exceptions;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.gestion_de_stock.produit.model.ErrorResponse;
+
+@RestControllerAdvice
+public class ProductExceptionHandler {
+
+	@ExceptionHandler(ProduitNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleProduitNotFoundException(ProduitNotFoundException pex) {
+		ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), pex.getMessage());
+
+		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+	}
+
+	// Gestion des erreurs de validation @Valid
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		Map<String, String> errors = new HashMap<>();
+		ex.getBindingResult().getFieldErrors().forEach(error -> {
+			errors.put(error.getField(), error.getDefaultMessage());
+		});
+
+		ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
+}
