@@ -37,7 +37,7 @@ public class ProduitService {
 		Set<Category> categories = categoryRepository.findAllById(dto.getCategoryIds()).stream()
 				.collect(Collectors.toSet());
 
-		Produit produit = Produit.builder().name(dto.getName()).price(dto.getPrice()).categoryList(categories).build();
+		Produit produit = ProduitMapper.fromDto(dto, categories);
 
 		Produit saved = produitRepository.save(produit);
 		return ProduitMapper.toDto(saved);

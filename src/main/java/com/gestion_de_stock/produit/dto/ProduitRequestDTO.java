@@ -12,8 +12,13 @@ public class ProduitRequestDTO {
 	@NotBlank(message = "Le nom du produit est obligatoire")
 	private String name;
 
+	private String description;
+
 	@Positive(message = "Le prix doit être positif")
 	private double price;
+
+	@Positive(message = "La quantité doit être positive")
+	private int quantity;
 
 	// On ne reçoit QUE les IDs des catégories
 	private Set<Long> categoryIds;

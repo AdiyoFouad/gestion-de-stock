@@ -1,4 +1,4 @@
-package com.gestion_de_stock.produit;
+package com.gestion_de_stock;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
