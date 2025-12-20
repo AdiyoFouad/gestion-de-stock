@@ -30,8 +30,7 @@ public class StockMovementController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public StockMovementResponseDTO createStockIn(@Valid @RequestBody StockMovementRequestDTO dto) {
 		dto.setType("IN");
-		// username sera plus tard récupéré via la sécurité (JWT)
-		return stockMovementService.createMovement(dto, "system");
+		return stockMovementService.createMovement(dto);
 	}
 
 	// Sortie de stock
@@ -39,7 +38,7 @@ public class StockMovementController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public StockMovementResponseDTO createStockOut(@Valid @RequestBody StockMovementRequestDTO dto) {
 		dto.setType("OUT");
-		return stockMovementService.createMovement(dto, "system");
+		return stockMovementService.createMovement(dto);
 	}
 
 	@GetMapping

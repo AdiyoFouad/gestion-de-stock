@@ -3,6 +3,8 @@ package com.gestion_de_stock.stockmovement.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +29,7 @@ public class StockMovementService {
 	private final StockMovementRepository stockMovementRepository;
 	private final ProduitRepository produitRepository;
 
-	public StockMovementResponseDTO createMovement(StockMovementRequestDTO dto, String username) {
+	public StockMovementResponseDTO createMovement(StockMovementRequestDTO dto) {
 		Produit produit = produitRepository.findById(dto.getProduitId())
 				.orElseThrow(() -> new ProduitNotFoundException("Produit inexistant"));
 
@@ -45,6 +47,7 @@ public class StockMovementService {
 		}
 		produitRepository.save(produit);
 
+		String username = getCurrentUsername();
 		// enregistrement du mouvement
 		StockMovement movement = StockMovement.builder().product(produit).type(type).quantity(dto.getQuantity())
 				.date(LocalDateTime.now()).username(username) // provisoire
@@ -63,5 +66,13 @@ public class StockMovementService {
 	public List<StockMovementResponseDTO> getHistoryForProduct(long produitId) {
 		return stockMovementRepository.findByProduct_ProduitIdOrderByDateDesc(produitId).stream()
 				.map(StockMovementMapper::toDto).toList();
+	}
+
+	private String getCurrentUsername() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return "system"; // ou null, selon ton choix
+		}
+		return authentication.getName();
 	}
 }
