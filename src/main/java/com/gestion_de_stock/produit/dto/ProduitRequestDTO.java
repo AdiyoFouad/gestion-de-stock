@@ -22,4 +22,7 @@ public class ProduitRequestDTO {
 
 	// On ne reçoit QUE les IDs des catégories
 	private Set<Long> categoryIds;
+
+	// ID du fournisseur
+	private Long supplierId;
 }

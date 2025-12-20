@@ -16,6 +16,9 @@ import com.gestion_de_stock.produit.exceptions.ProduitNotFoundException;
 import com.gestion_de_stock.produit.mapper.ProduitMapper;
 import com.gestion_de_stock.produit.model.Produit;
 import com.gestion_de_stock.produit.repository.ProduitRepository;
+import com.gestion_de_stock.supplier.exceptions.SupplierNotFoundException;
+import com.gestion_de_stock.supplier.model.Supplier;
+import com.gestion_de_stock.supplier.repository.SupplierRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ public class ProduitService {
 
 	private final ProduitRepository produitRepository;
 	private final CategoryRepository categoryRepository;
+	private final SupplierRepository supplierRepository;
 
 	@Transactional(readOnly = true)
 	public List<ProduitResponseDTO> getAllProduits() {
@@ -37,7 +41,13 @@ public class ProduitService {
 		Set<Category> categories = categoryRepository.findAllById(dto.getCategoryIds()).stream()
 				.collect(Collectors.toSet());
 
-		Produit produit = ProduitMapper.fromDto(dto, categories);
+		Supplier supplier = null;
+		if (dto.getSupplierId() != null) {
+			supplier = supplierRepository.findById(dto.getSupplierId())
+					.orElseThrow(() -> new SupplierNotFoundException("Fournisseur inexistant"));
+		}
+
+		Produit produit = ProduitMapper.fromDto(dto, categories, supplier);
 
 		Produit saved = produitRepository.save(produit);
 		return ProduitMapper.toDto(saved);
@@ -64,20 +74,22 @@ public class ProduitService {
 	}
 
 	public ProduitResponseDTO editProduit(long id, ProduitRequestDTO dto) {
-
-		Optional<Produit> optionalProduit = produitRepository.findById(id);
-
-		if (optionalProduit.isEmpty()) {
-			throw new RuntimeException("Modification impossible");
-		}
-
-		Produit produitAModifier = optionalProduit.get();
+		Produit produitAModifier = produitRepository.findById(id)
+				.orElseThrow(() -> new ProduitNotFoundException("Modification impossible"));
 
 		Set<Category> categories = categoryRepository.findAllById(dto.getCategoryIds()).stream()
 				.collect(Collectors.toSet());
 
-		ProduitMapper.updateEntityFromDto(dto, produitAModifier, categories);
+		Supplier supplier = null;
+		if (dto.getSupplierId() != null) {
+			supplier = supplierRepository.findById(dto.getSupplierId())
+					.orElseThrow(() -> new SupplierNotFoundException("Fournisseur inexistant"));
+		}
 
-		return ProduitMapper.toDto(produitRepository.save(produitAModifier));
+		ProduitMapper.updateEntityFromDto(dto, produitAModifier, categories, supplier);
+
+		Produit saved = produitRepository.save(produitAModifier);
+		return ProduitMapper.toDto(saved);
 	}
+
 }

@@ -7,6 +7,7 @@ import com.gestion_de_stock.category.model.Category;
 import com.gestion_de_stock.produit.dto.ProduitRequestDTO;
 import com.gestion_de_stock.produit.dto.ProduitResponseDTO;
 import com.gestion_de_stock.produit.model.Produit;
+import com.gestion_de_stock.supplier.model.Supplier;
 
 public class ProduitMapper {
 
@@ -23,19 +24,26 @@ public class ProduitMapper {
 		Set<String> categories = produit.getCategoryList().stream().map(Category::getName).collect(Collectors.toSet());
 		dto.setCategories(categories);
 
+		if (produit.getSupplier() != null) {
+			dto.setSupplierId(produit.getSupplier().getSupplierId());
+			dto.setSupplierName(produit.getSupplier().getName());
+		}
+
 		return dto;
 	}
 
-	public static Produit fromDto(ProduitRequestDTO dto, Set<Category> categories) {
+	public static Produit fromDto(ProduitRequestDTO dto, Set<Category> categories, Supplier supplier) {
 		return Produit.builder().name(dto.getName()).description(dto.getDescription()).price(dto.getPrice())
-				.quantity(dto.getQuantity()).categoryList(categories).build();
+				.quantity(dto.getQuantity()).categoryList(categories).supplier(supplier).build();
 	}
 
-	public static void updateEntityFromDto(ProduitRequestDTO dto, Produit produit, Set<Category> categories) {
-		produit.setName(dto.getName());
-		produit.setDescription(dto.getDescription());
-		produit.setPrice(dto.getPrice());
-		produit.setQuantity(dto.getQuantity());
-		produit.setCategoryList(categories);
+	public static void updateEntityFromDto(ProduitRequestDTO dto, Produit entity, Set<Category> categories,
+			Supplier supplier) {
+		entity.setName(dto.getName());
+		entity.setDescription(dto.getDescription());
+		entity.setPrice(dto.getPrice());
+		entity.setQuantity(dto.getQuantity());
+		entity.setCategoryList(categories);
+		entity.setSupplier(supplier);
 	}
 }

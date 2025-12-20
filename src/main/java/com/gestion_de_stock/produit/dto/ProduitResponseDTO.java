@@ -17,6 +17,9 @@ public class ProduitResponseDTO {
 	// Noms des catégories (simple pour le client)
 	private Set<String> categories;
 
+	private Long supplierId;
+	private String supplierName;
+
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 }
