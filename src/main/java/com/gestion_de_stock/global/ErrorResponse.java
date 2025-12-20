@@ -1,4 +1,4 @@
-package com.gestion_de_stock.produit.model;
+package com.gestion_de_stock.global;
 
 import java.time.LocalDateTime;
 import java.util.Map;

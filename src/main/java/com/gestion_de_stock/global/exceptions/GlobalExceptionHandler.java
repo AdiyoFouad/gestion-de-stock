@@ -1,4 +1,4 @@
-package com.gestion_de_stock.produit.exceptions;
+package com.gestion_de_stock.global.exceptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,17 +9,26 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.gestion_de_stock.produit.model.ErrorResponse;
+import com.gestion_de_stock.category.exceptions.CategoryNotFoundException;
+import com.gestion_de_stock.global.ErrorResponse;
+import com.gestion_de_stock.produit.exceptions.ProduitNotFoundException;
 
 @RestControllerAdvice
-public class ProductExceptionHandler {
+public class GlobalExceptionHandler {
 
 	@ExceptionHandler(ProduitNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleProduitNotFoundException(ProduitNotFoundException pex) {
-		ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), pex.getMessage());
+	public ResponseEntity<ErrorResponse> handleProduitNotFoundException(ProduitNotFoundException ex) {
+		ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
 
 		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 
+	}
+
+	@ExceptionHandler(CategoryNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+		ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+
+		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 	}
 
 	// Gestion des erreurs de validation @Valid
