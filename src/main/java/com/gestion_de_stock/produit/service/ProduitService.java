@@ -6,12 +6,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gestion_de_stock.category.model.Category;
 import com.gestion_de_stock.category.repository.CategoryRepository;
 import com.gestion_de_stock.produit.dto.ProduitRequestDTO;
 import com.gestion_de_stock.produit.dto.ProduitResponseDTO;
 import com.gestion_de_stock.produit.exceptions.ProduitNotFoundException;
+import com.gestion_de_stock.produit.mapper.ProduitMapper;
 import com.gestion_de_stock.produit.model.Produit;
 import com.gestion_de_stock.produit.repository.ProduitRepository;
 
@@ -19,14 +21,16 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProduitService {
 
 	private final ProduitRepository produitRepository;
 	private final CategoryRepository categoryRepository;
 
+	@Transactional(readOnly = true)
 	public List<ProduitResponseDTO> getAllProduits() {
 		// TODO Auto-generated method stub
-		return produitRepository.findAll().stream().map(this::mapToResponseDTO).toList();
+		return produitRepository.findAll().stream().map(ProduitMapper::toDto).toList();
 	}
 
 	public ProduitResponseDTO createProduit(ProduitRequestDTO dto) {
@@ -36,16 +40,17 @@ public class ProduitService {
 		Produit produit = Produit.builder().name(dto.getName()).price(dto.getPrice()).categoryList(categories).build();
 
 		Produit saved = produitRepository.save(produit);
-		return mapToResponseDTO(saved);
+		return ProduitMapper.toDto(saved);
 	}
 
+	@Transactional(readOnly = true)
 	public ProduitResponseDTO getProduitById(long id) {
 		Optional<Produit> optionalProduit = produitRepository.findById(id);
 
 		if (optionalProduit.isEmpty()) {
 			throw new ProduitNotFoundException("Produit inexistant");
 		}
-		return mapToResponseDTO(optionalProduit.get());
+		return ProduitMapper.toDto(optionalProduit.get());
 	}
 
 	public void deleteProduitById(long id) {
@@ -68,23 +73,11 @@ public class ProduitService {
 
 		Produit produitAModifier = optionalProduit.get();
 
-		produitAModifier.setName(dto.getName());
-		produitAModifier.setPrice(dto.getPrice());
-
 		Set<Category> categories = categoryRepository.findAllById(dto.getCategoryIds()).stream()
 				.collect(Collectors.toSet());
 
-		produitAModifier.setCategoryList(categories);
+		ProduitMapper.updateEntityFromDto(dto, produitAModifier, categories);
 
-		return mapToResponseDTO(produitRepository.save(produitAModifier));
-	}
-
-	private ProduitResponseDTO mapToResponseDTO(Produit produit) {
-		ProduitResponseDTO dto = new ProduitResponseDTO();
-		dto.setProduitId(produit.getProduitId());
-		dto.setName(produit.getName());
-		dto.setPrice(produit.getPrice());
-		dto.setCategories(produit.getCategoryList().stream().map(Category::getName).collect(Collectors.toSet()));
-		return dto;
+		return ProduitMapper.toDto(produitRepository.save(produitAModifier));
 	}
 }
